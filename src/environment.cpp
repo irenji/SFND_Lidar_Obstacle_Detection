@@ -42,13 +42,19 @@ void simpleHighway(pcl::visualization::PCLVisualizer::Ptr& viewer)
     // ----------------------------------------------------
     
     // RENDER OPTIONS
-    bool renderScene = true;
+    bool renderScene = false;
     std::vector<Car> cars = initHighway(renderScene, viewer);
-    
-    // TODO:: Create lidar sensor 
 
-    // TODO:: Create point processor
-  
+    Lidar *lidar = new Lidar(cars, 0.0);
+    auto rays = lidar->scan();
+    renderPointCloud(viewer, rays, "Rays");
+
+    ProcessPointClouds<pcl::PointXYZ> *pointProcessor = new ProcessPointClouds<pcl::PointXYZ>();
+    auto result = pointProcessor->SegmentPlane(rays, 100, 0.2);
+
+
+    renderPointCloud(viewer, result.first, "obstcle", Color(1, 0, 0));
+    renderPointCloud(viewer, result.second, "plane", Color(0, 1, 0));
 }
 
 
